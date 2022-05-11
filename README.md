@@ -123,9 +123,30 @@ it though NGA50/LGA50 stististics. LGA50 gives you the minimum number
 Assembling mock bacterial community from PacBio HiFi data
 ---------------------------------------------------------
 
-Download reads and references:
+The previous mock community consisted of different bacterial species
+and mostly different genera. In a real metagenome, we commonly see many
+closely-related species or strains. To model this, PacBio
+recently released [HiFi sequencing](https://www.ncbi.nlm.nih.gov/sra/SRR13128014) 
+of mock bacterial community with 5 E.coli strains, among other species. Let's give it a try!
+
+As before, I've prepared a downsampled version here:
 
 ```
 wget XXX_SRR13128014_hifi_1gb.fastq.gz
+```
+
+Assembly using metaFlye's hifi mode:
+
+```
+flye --pacbio-hifi SRR13128014_hifi_1gb.fastq.gz -o flye_hifi -t 30 --meta
+```
+
+If you visualize the assembly with Bandage as before, you'll notice that some
+tangled components, in addition to nicely assembled circular chromosomes.
+
+![Bandagehifi](hifi_graph.png)
+
+Similarly, you can run QUAST analysis with the following references:
+```
 wget YYY_SRR13128014_refs.tar.gz
 ```
