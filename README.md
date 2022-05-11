@@ -144,7 +144,7 @@ Now, we are ready to run CheckM:
 
 ```
 checkm lineage_wf -x fasta checkm_bins checkm_out -t 10 --pplacer_threads 10 -f checkm_out/qa_table.txt
-cat checkm/qa_table.txt
+cat checkm_out/qa_table.txt
 ```
 
 You might see the following summary:
