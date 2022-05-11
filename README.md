@@ -57,7 +57,7 @@ to download the graph file to local machine first.
 
 This is how your assembly might look like, visualized by Bandage:
 
-i![Bandageont](ont_graph.png)
+![Bandageont](ont_graph.png)
 
 Notice multiple circular chromosomes, that likely correspond to
 complete bacterial genomes. There are also two pairs of bacterial
