@@ -38,7 +38,7 @@ basecaller (Guppy 5).
 To download reads, use:
 
 ```
-wget XXX_zendo/Nicholls_ont_guppy5_1gb.fastq.gz
+wget https://zenodo.org/record/6537461/files/Nicholls_ont_guppy5_1gb.fastq.gz
 ```
 
 Then, run metaFlye as follows:
@@ -72,7 +72,7 @@ genomes for this particular community.
 Download and extract reference genomes as follows:
 
 ```
-wget ZENODO_Nicholls_ont_refs.tar.gz
+wget https://zenodo.org/record/6537461/files/Nicholls_ont_refs.tar.gz
 tar -xvf Nicholls_ont_refs.tar.gz
 ```
 
@@ -182,7 +182,7 @@ of mock bacterial community with 5 E.coli strains, among other species. Let's gi
 As before, I've prepared a downsampled version here:
 
 ```
-wget XXX_SRR13128014_hifi_1gb.fastq.gz
+wget https://zenodo.org/record/6537461/files/SRR13128014_hifi_1gb.fastq.gz
 ```
 
 Assembly using metaFlye's hifi mode:
@@ -199,5 +199,5 @@ tangled components, in addition to nicely assembled circular chromosomes.
 
 Similarly, you can run QUAST analysis with the following references:
 ```
-wget YYY_SRR13128014_refs.tar.gz
+wget https://zenodo.org/record/6537461/files/SRR13128014_refs.tar.gz
 ```
