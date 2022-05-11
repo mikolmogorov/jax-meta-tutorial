@@ -18,7 +18,7 @@ If you don't have it already, download and install bioconda as described [here](
 Instal the required tools in a separate environemnt
 
 ```
-conda create -n jax-meta-tutorial flye=2.9 quast bandage
+conda create -n jax-meta-tutorial flye=2.9 quast bandage checkm-genome biopython wget
 conda activate jax-meta-tutorial
 ```
 
@@ -117,8 +117,58 @@ For example, for `L.monocytogenes`, the total number of
 mismatches + indels is about 10 per 100kb, which translates
 into ~QV40. Not bad!
 
-Finally, let's check the contiguity. A common way to measure
-it though NGA50/LGA50 stististics. LGA50 gives you the minimum number 
+Finally, how complete our assmeblies are? And what to do if we are analysing
+a real metagenome and don't have references? In this case, CheckM
+could be helpful.
+
+First, download the reference database, and set it up:
+
+```
+wget https://data.ace.uq.edu.au/public/CheckM_databases/checkm_data_2015_01_16.tar.gz
+mkdir checkm_data && tar -xvf checkm_data_2015_01_16.tar.gz -C checkm_data
+checkm data setRoot `pwd`/checkm_data
+```
+
+CheckM was designed to work with metagenomic bins (MAGs), however
+in our situation our contigs are already as good as MAGs (if not better).
+Therefore, we will create "fake" bins with only a single contig within each bin.
+To make it convenient, I've prepared a converter script for you.
+The command below converts all contigs longer than 100kb into bins.
+
+```
+wget https://raw.githubusercontent.com/fenderglass/jax-meta-tutorial/main/create_meta_bins.py
+python create_meta_bins.py flye_ont/assembly.fasta 100000 checkm_bins
+```
+
+Now, we are ready to run CheckM:
+
+```
+checkm lineage_wf -x fasta checkm_bins checkm_out -t 10 --pplacer_threads 10 -f checkm_out/qa_table.txt
+cat checkm/qa_table.txt
+```
+
+You might see the following summary:
+
+```
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  Bin Id                Marker lineage           # genomes   # markers   # marker sets    0     1     2   3   4   5+   Completeness   Contamination   Strain heterogeneity  
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  contig_183         g__Bacillus (UID865)            36         1200          269         8    1190   2   0   0   0       99.64            0.25               0.00          
+  contig_34      o__Lactobacillales (UID544)        293         475           267         2    472    1   0   0   0       99.53            0.19               0.00          
+  contig_51    f__Enterobacteriaceae (UID5139)      119         1169          340         8    1160   1   0   0   0       99.31            0.04               0.00          
+  contig_32      o__Pseudomonadales (UID4488)       185         813           308         5    803    5   0   0   0       99.00            0.61               0.00          
+  contig_19    f__Enterobacteriaceae (UID5124)      134         1173          336         10   1154   9   0   0   0       98.96            0.20              77.78          
+  contig_156     o__Lactobacillales (UID355)        490         334           183         4    329    1   0   0   0       98.63            0.55              100.00         
+  contig_72       g__Staphylococcus (UID301)         45         940           178         9    930    1   0   0   0       98.50            0.08               0.00          
+  contig_99          c__Bacilli (UID354)            515         329           183        103   226    0   0   0   0       74.32            0.00               0.00          
+  contig_97          c__Bacilli (UID354)            515         329           183        259    70    0   0   0   0       15.30            0.00               0.00          
+  contig_98              root (UID1)                5656         56            24         55    1     0   0   0   0        4.17            0.00               0.00          
+  contig_300             root (UID1)                5656         56            24         56    0     0   0   0   0        0.00            0.00               0.00          
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+```
+
+You can see that 7 contigs represent bacterial genomes with 98%+ completeness. And looks like one bacteria was
+split into two large contigs (contig_99 and contig_97). Must be that one tangle!
 
 Assembling mock bacterial community from PacBio HiFi data
 ---------------------------------------------------------
@@ -145,6 +195,7 @@ If you visualize the assembly with Bandage as before, you'll notice that some
 tangled components, in addition to nicely assembled circular chromosomes.
 
 ![Bandagehifi](hifi_graph.png)
+
 
 Similarly, you can run QUAST analysis with the following references:
 ```
