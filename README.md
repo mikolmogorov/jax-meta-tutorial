@@ -18,7 +18,7 @@ If you don't have it already, download and install bioconda as described [here](
 Instal the required tools in a separate environemnt
 
 ```
-conda create -n jax-meta-tutorial flye=2.9 quast bandage checkm-genome biopython wget
+conda create -n jax-meta-tutorial flye=2.9 quast bandage checkm-genome biopython wget minimap2 samtools
 conda activate jax-meta-tutorial
 ```
 
@@ -196,8 +196,35 @@ tangled components, in addition to nicely assembled circular chromosomes.
 
 ![Bandagehifi](hifi_graph.png)
 
-
-Similarly, you can run QUAST analysis with the following references:
+Similarly to the ONT dataset, you can run also QUAST analysis with the following references:
 ```
 wget https://zenodo.org/record/6537461/files/SRR13128014_refs.tar.gz
 ```
+
+But why the assembly grpah is tangled? Some graph edges actually represent multiple (collapsed) strains,
+and some edges correspond to one single strain. Let's look into the read alinments.
+First, let's convert graph nodes from gfa into fasta format:
+
+```
+awk '/^S/{print ">"$2"\n"$3}' flye_hifi/assembly_graph.gfa | fold > assembly_graph.fasta
+```
+
+Then, align reads with minimap2:
+
+```
+minimap2 -ax map-hifi assembly_graph.fasta SRR13128014_1gb.fastq.gz -t 30 | samtools sort > graph_alignment.bam
+samtools index graph_alignment.bam
+```
+
+Next, let's open the bam alignment using [IGV](https://software.broadinstitute.org/software/igv/download).
+A "regular" strain-specific assembly segment should look like this (e.g. no detectable SNPs):
+
+![igv_specific](igv_strain_specific.png)
+
+However, an assembly segment that represent multiple collapsed bacterial strains may look like this:
+
+![igv_collapsed](igv_strain_collapsed.png)
+
+Try to play with the Bandage graph visualization and figure out which graph node is collapsed and which is not, 
+and then verify it in IGV!
+
